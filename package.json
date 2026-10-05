@@ -1,18 +1,17 @@
 {
-  "name": "jtd-calendar-card",
-  "version": "1.0.0",
-  "description": "Home Assistant month calendar card with week view, calendar events and forecast + historical weather.",
+  "name": "jtdhass",
+  "description": "Home Assistant dashboard cards and other add-ons by JTD.",
   "type": "module",
   "private": true,
+  "workspaces": [
+    "cards/*"
+  ],
   "scripts": {
-    "build": "node build.mjs",
-    "watch": "node build.mjs --watch",
+    "build": "node scripts/build.mjs",
+    "watch": "node scripts/build.mjs --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "check": "npm run typecheck && npm run test && npm run build"
-  },
-  "dependencies": {
-    "lit": "^3.3.3"
   },
   "devDependencies": {
     "@mdi/js": "^7.4.47",

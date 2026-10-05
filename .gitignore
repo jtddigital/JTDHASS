@@ -1,4 +1,4 @@
 node_modules/
-demo/screenshots/
+cards/*/demo/screenshots/
 *.log
 .DS_Store

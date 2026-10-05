@@ -1,0 +1,15 @@
+{
+  "name": "jtd-calendar-card",
+  "version": "1.0.0",
+  "description": "Month calendar and expandable week view with forecast and historical weather on every day.",
+  "type": "module",
+  "private": true,
+  "jtdhass": {
+    "kind": "card",
+    "entry": "src/jtd-calendar-card.ts",
+    "output": "jtd-calendar-card.js"
+  },
+  "dependencies": {
+    "lit": "^3.3.3"
+  }
+}

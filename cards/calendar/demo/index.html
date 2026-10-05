@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>JTD Calendar Card demo</title>
+    <link rel="stylesheet" href="/tools/demo/ha-theme.css" />
+    <script type="module" src="/tools/demo/ha-stubs.js"></script>
+  </head>
+  <body>
+    <div id="cards"></div>
+    <script type="module">
+      import "/dist/jtd-calendar-card.js";
+      import { createHass } from "./mock-hass.js";
+
+      const params = new URLSearchParams(location.search);
+
+      const base = {
+        type: "custom:jtd-calendar-card",
+        entities: [
+          { entity: "calendar.family", name: "Family" },
+          { entity: "calendar.work", color: "purple" },
+          "calendar.holidays",
+        ],
+        weather_entity: "weather.home",
+        temperature_entity: "sensor.outdoor_temperature",
+        open_meteo: true,
+      };
+      const variants = {
+        month: { ...base, title: "Family calendar" },
+        weeks: { ...base, view: "weeks", weeks: 2 },
+        weeks1: { ...base, view: "weeks", weeks: 1, past_weeks: 0 },
+        plain: { ...base, open_meteo: false, temperature_entity: undefined, show_legend: false },
+      };
+      const variant = params.get("variant") || "month";
+      const card = document.createElement("jtd-calendar-card");
+      card.setConfig(variants[variant]);
+      card.hass = createHass();
+      document.getElementById("cards").append(card);
+      window.card = card;
+    </script>
+  </body>
+</html>

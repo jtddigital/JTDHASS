@@ -1,185 +1,130 @@
-# JTD Month Calendar Card
+# JTDHASS
 
-A Home Assistant dashboard card that shows your calendars as a **monthly calendar** or an
-**expandable Sunday–Saturday week view**, with **weather on every day**: recorded weather for
-past days, the forecast for the coming days, and typical weather for the rest of the month.
+Home Assistant add-ons by JTD: dashboard cards today, with room for blueprints, themes and more.
 
-![Month view](docs/images/month-light.png)
+## What's inside
 
-| Week view (2 weeks, expandable) | Phone width |
-| --- | --- |
-| ![Week view](docs/images/weeks-light.png) | ![Mobile](docs/images/mobile-light.png) |
+| | Name | Type | Docs |
+| --- | --- | --- | --- |
+| <img src="cards/calendar/docs/images/month-light.png" width="260" alt="Month calendar card"> | **Month Calendar & Weather** | Dashboard card (`custom:jtd-calendar-card`) | [cards/calendar](cards/calendar/README.md) |
 
-| Dark theme | Day details |
-| --- | --- |
-| ![Dark](docs/images/month-dark.png) | ![Day dialog](docs/images/dialog-day.png) |
-
-_Screenshots use demo data._
-
-## Features
-
-- **Month view** with Sunday–Saturday rows (Monday-first optional), multi-day events drawn as bars
-  across days, timed events with start times, and a "+N more" link when a day is full.
-- **Week view** showing 1 to 6 weeks. Expand or shrink it with the ▲/▼ buttons under the grid,
-  page through weeks with the arrows, and switch back to the month with one tap.
-- **Any Home Assistant calendar** (Google, CalDAV, Local Calendar, Microsoft 365, …). Events update
-  live through Home Assistant's `calendar/event/subscribe` API. On older versions the card refreshes
-  every 5 minutes instead.
-- **Weather for the whole month**:
-  - *Past days*: the weather entity's recorded history (condition, highs and lows) and/or the
-    long-term statistics of an outdoor temperature sensor, which keep highs and lows for every day.
-  - *Today and the coming days*: the forecast from your weather entity.
-  - *Gaps* (optional, no API key): [Open-Meteo](https://open-meteo.com) fills days Home Assistant has no
-    data for, with history and a 16-day forecast.
-  - *Rest of the month* (optional): the typical high/low for that date, averaged over the last 5 years
-    (shown as `~68°`).
-- **Day and event details** in a dialog: full weather for the day, every event, times, location and
-  description.
-- **Calendar legend** whose chips show or hide each calendar.
-- Built the current Home Assistant way: Lit 3, a visual editor made from Home Assistant's form
-  selectors, the sections-view grid (`getGridOptions`), theme colors and design tokens (light and dark
-  mode), and layouts that adapt to the card's width with container queries.
+A month calendar and expandable Sunday–Saturday week view for your Home Assistant calendars, with
+recorded, forecast and typical weather on every day of the month.
 
 ## Installation
+
+Every card in this repository is built into one file, `dist/jtdhass.js`, so one install gives you all
+of them and new cards appear with HACS updates.
 
 ### HACS (recommended)
 
 1. In Home Assistant open **HACS**, select the **⋮** menu (top right), then **Custom repositories**.
 2. Add `https://github.com/jtddigital/JTDHASS` with type **Dashboard**.
-3. Search for **JTD Month Calendar Card**, open it, and select **Download**.
+3. Search for **JTD Home Assistant Cards**, open it, and select **Download**.
 4. Reload the browser when HACS asks you to.
 
-HACS adds the dashboard resource for you.
+HACS adds the dashboard resource for you. Then edit a dashboard, select **Add card** and search for
+the card by name.
 
 ### Manual
 
-1. Download [`dist/jtd-calendar-card.js`](dist/jtd-calendar-card.js) and copy it to
-   `/config/www/jtd-calendar-card.js`.
+1. Download [`dist/jtdhass.js`](dist/jtdhass.js) and copy it to `/config/www/jtdhass.js`.
 2. Go to **Settings → Dashboards**, select the **⋮** menu (top right), then **Resources**. If you don't
    see **Resources**, turn on **Advanced mode** in your user profile first.
-3. Select **Add resource**, enter URL `/local/jtd-calendar-card.js`, choose **JavaScript module**, and
-   save.
+3. Select **Add resource**, enter URL `/local/jtdhass.js`, choose **JavaScript module**, and save.
 4. Reload the browser.
 
-## Adding the card
+Each card is also built on its own (for example [`dist/jtd-calendar-card.js`](dist/jtd-calendar-card.js))
+if you only want one.
 
-Edit a dashboard, select **Add card**, and search for **Month Calendar & Weather**. Everything can be
-set in the visual editor. Or use YAML:
+> **Installed the calendar card through HACS before the bundle existed?** Updating it in HACS switches
+> its dashboard resource from `jtd-calendar-card.js` to `jtdhass.js` for you. Manual installs of
+> `jtd-calendar-card.js` keep working; if you later add `jtdhass.js` too, remove the old resource.
 
-```yaml
-type: custom:jtd-calendar-card
-entities:
-  - entity: calendar.family
-  - entity: calendar.work
-    color: purple
-weather_entity: weather.home
+## Repository layout
+
+```text
+cards/                    Dashboard cards, one folder each (npm workspaces)
+  calendar/
+    package.json          card name, version and build settings ("jtdhass" block)
+    src/                  TypeScript + Lit source
+    test/                 unit tests (Vitest)
+    demo/                 page that renders the card with a mocked Home Assistant
+    docs/images/          screenshots for the card's README
+    README.md             card documentation
+dist/                     built files, committed so HACS and manual installs work
+  jtdhass.js              every card in one file (installed by HACS)
+  jtd-calendar-card.js    each card on its own
+scripts/build.mjs         builds every card it finds in cards/
+tools/demo/               shared demo helpers: ha-card/ha-icon stand-ins, theme, screenshot harness
+hacs.json                 HACS settings (Dashboard type, installs dist/jtdhass.js)
 ```
 
-A configuration that covers every day of the month with weather:
+## Adding things
 
-```yaml
-type: custom:jtd-calendar-card
-title: Family calendar
-entities:
-  - entity: calendar.family
-    name: Family
-  - entity: calendar.work
-    color: purple
-  - calendar.us_holidays # plain entity ids work too
-view: month # or "weeks"
-weeks: 2 # rows in the week view (1-6)
-weather_entity: weather.home
-temperature_entity: sensor.outdoor_temperature
-open_meteo: true
-```
+### A new dashboard card
 
-> **Tip (sections view):** a calendar needs room. Open the section's settings and widen it
-> (for example to 3 or 4 columns), or put the card in a **Panel** view.
+1. Create `cards/<name>/package.json`:
 
-## Options
+   ```json
+   {
+     "name": "jtd-<name>-card",
+     "version": "1.0.0",
+     "type": "module",
+     "private": true,
+     "jtdhass": { "kind": "card", "entry": "src/jtd-<name>-card.ts", "output": "jtd-<name>-card.js" },
+     "dependencies": { "lit": "^3.3.3" }
+   }
+   ```
 
-| Option | Default | Description |
-| --- | --- | --- |
-| `entities` | — | Calendars. Each item is an entity id or an object with `entity`, `name` and `color`. |
-| `title` | — | Text above the calendar. |
-| `view` | `month` | View when the dashboard opens: `month` or `weeks`. |
-| `weeks` | `2` | Week rows the week view starts with (1–6). |
-| `past_weeks` | `0` | Start the week view this many weeks before the current week. |
-| `first_day_of_week` | `sunday` | `sunday` or `monday`. |
-| `max_events_per_day` | `4` | Event rows per day before "+N more". Doubled in the week view at 1–2 weeks. |
-| `show_controls` | `true` | Navigation arrows, Today, view switch and the week expander. |
-| `show_legend` | `true` | Calendar chips that show and hide calendars (when there are 2 or more). |
-| `show_event_time` | `true` | Start time in front of timed events. |
-| `dim_past` | `true` | Fade past days and events. |
-| `weather_entity` | — | `weather.*` entity for the forecast; its recorded history covers past days. |
-| `temperature_entity` | — | Outdoor temperature sensor. Its long-term statistics give highs and lows for any past day. |
-| `show_forecast` | `true` | Show weather for today and future days. |
-| `show_history` | `true` | Show weather for past days. |
-| `show_precipitation` | `true` | Show the chance of precipitation on forecast days when it is 20% or more (on wide cards). |
-| `open_meteo` | `false` | Fill days without weather from Open-Meteo for your home location. |
-| `show_normals` | `true` | With `open_meteo`, show the 5-year average for days past the 16-day forecast. |
+2. Write the card in `cards/<name>/src/`. Register it only if it isn't defined yet, and add it to the
+   card picker, so it can be loaded from both the bundle and its own file:
 
-### Calendar colors
+   ```ts
+   if (!customElements.get("jtd-<name>-card")) {
+     customElements.define("jtd-<name>-card", MyCard);
+   }
+   window.customCards = window.customCards || [];
+   window.customCards.push({ type: "jtd-<name>-card", name: "…", description: "…", preview: true });
+   ```
 
-Colors are chosen in this order:
+3. Put tests in `cards/<name>/test/*.test.ts` and, optionally, a demo page in `cards/<name>/demo/`
+   that uses `/tools/demo/ha-theme.css` and `/tools/demo/ha-stubs.js` (see the calendar card's demo).
+4. Run `npm install`, then `npm run check`. The build picks the card up automatically: it lands in
+   `dist/jtd-<name>-card.js` and in `dist/jtdhass.js`.
+5. Add a row to [What's inside](#whats-inside) and commit the source together with `dist/`.
 
-1. `color` in the card configuration: a Home Assistant color name (`red`, `teal`, `primary`, …) or any
-   CSS color (`"#e91e63"`).
-2. The color picked in the calendar entity's settings (**Settings → Entities → your calendar →
-   ⚙️**), the same one the built-in calendar uses.
-3. Home Assistant's theme palette.
+### Blueprints
 
-### Where the weather comes from
+Put automation blueprints in `blueprints/automation/<name>.yaml` and script blueprints in
+`blueprints/script/<name>.yaml`. They're imported straight from GitHub: in Home Assistant go to
+**Settings → Automations & scenes → Blueprints → Import blueprint** and paste the file's GitHub URL.
+Add a row for each one to [What's inside](#whats-inside).
 
-| Days | Source (first that has data wins) | Shown as |
-| --- | --- | --- |
-| Before today | temperature sensor statistics (highs/lows) + weather entity history (condition) → Open-Meteo history¹ | icon, high, low |
-| Today and the next days your forecast covers (often 5–10) | weather entity forecast → Open-Meteo forecast¹ | icon, high, low, rain chance |
-| Up to 16 days ahead | Open-Meteo forecast¹ | icon, high, low, rain chance |
-| Further ahead | 5-year average for the date¹ | `~high low` in italics |
+### Themes
 
-¹ Only with `open_meteo: true`.
+Put themes in `themes/<name>.yaml`. To use one, copy it into the `themes` folder of your Home
+Assistant configuration (with `frontend: themes: !include_dir_merge_named themes` in
+`configuration.yaml`) and pick it in your user profile.
 
-Hovering a day's weather shows whether it is a forecast, observed or typical; selecting the day also
-shows which entity or service it came from.
+### Integrations
 
-Home Assistant keeps state history for 10 days by default (`purge_keep_days`), so past-day
-**conditions** from the weather entity reach back about that far. The temperature sensor's statistics
-are kept indefinitely, which is why `temperature_entity` is the best way to get highs and lows for a
-whole past month.
-
-**Privacy:** with `open_meteo: true`, your browser sends your home's coordinates (rounded to about
-1 km) to `api.open-meteo.com` and `archive-api.open-meteo.com`. Nothing else is sent and no key is
-needed. Leave it off to use Home Assistant data only.
-
-## Theming
-
-The card follows your Home Assistant theme. These optional variables change the weather icon colors:
-
-```yaml
-jtd-calendar-sun-color: "#f9a825"
-jtd-calendar-night-color: "#7e8fbf"
-jtd-calendar-cloud-color: "#9e9e9e"
-jtd-calendar-rain-color: "#1e88e5"
-jtd-calendar-snow-color: "#4fc3f7"
-jtd-calendar-storm-color: "#7e57c2"
-jtd-calendar-wind-color: "#26a69a"
-```
+HACS installs a repository as a single type, and this one is set up as **Dashboard**. A custom
+integration you want to install through HACS should live in its own repository; one that you install
+by hand can live in `custom_components/<domain>/` here.
 
 ## Development
 
+Requires Node.js 22 or newer.
+
 ```bash
 npm install
-npm run build      # bundles src/ into dist/jtd-calendar-card.js
+npm run build      # builds every card into dist/ (and the dist/jtdhass.js bundle)
 npm run watch      # rebuilds on change
-npm test           # unit tests (date math, event layout, weather aggregation)
+npm test           # unit tests for all cards
 npm run typecheck
+npm run check      # all of the above
 ```
 
-`demo/index.html` renders the card with a mocked Home Assistant connection. Serve the repository root
-(for example `npx serve .`) and open `/demo/index.html?variant=month`; other variants are `weeks`,
-`weeks1` and `plain`, and `&theme=dark` switches to dark mode. `node demo/screenshot.mjs` saves
-screenshots using Playwright.
-
-Commit the rebuilt `dist/` file with source changes; CI checks that it is up to date. Publishing a
-GitHub release attaches the built file for HACS.
+Commit the rebuilt `dist/` files with source changes; CI checks that they are up to date. Publishing a
+GitHub release attaches the built files to it.

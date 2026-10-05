@@ -1,6 +1,6 @@
 {
-  "name": "JTD Month Calendar Card",
-  "filename": "jtd-calendar-card.js",
+  "name": "JTD Home Assistant Cards",
+  "filename": "jtdhass.js",
   "render_readme": true,
   "homeassistant": "2025.1.0"
 }

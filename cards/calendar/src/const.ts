@@ -1,11 +1,11 @@
+import { version } from "../package.json";
 import type { CardConfig } from "./types";
 
 export const CARD_TYPE = "jtd-calendar-card";
 export const EDITOR_TYPE = "jtd-calendar-card-editor";
 export const CARD_NAME = "Month Calendar & Weather";
 
-declare const __CARD_VERSION__: string;
-export const CARD_VERSION = typeof __CARD_VERSION__ === "string" ? __CARD_VERSION__ : "dev";
+export const CARD_VERSION = version;
 
 /** Values used when a key is missing from the card configuration. */
 export const DEFAULTS = {
